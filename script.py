@@ -21,29 +21,31 @@ class Counter(object):
     def value(self):
         return self.val.value
 
+
 def run_process(row_number, output_filename):
-    print(f'run_process: {counter.value}')
+    print(f'run_process: {row_number}')
     browser = get_driver()
-    p_id = get_pid()
+    p_id = get_pid(row_number)
     if connect_to_base(browser, p_id):
-        sleep(2)
+        sleep(1)
         html = browser.page_source
         properties = get_owner_data(html, p_id)
         # print(properties)
-        if counter.value % 50 == 0:
+        counter.increment()
+        if counter.value % 51 == 0:
             print(f'writing to csv: {output_filename}')
             properties.to_csv('result_' + output_filename)
-        counter.increment()
         browser.quit()
     else:
         print('Error connecting')
         browser.quit()
 
-def get_pid():
-    print(f'get_pid {counter.value}')
+
+def get_pid(row_num):
+    # print(f'get_pid {row_num}')
     with open("property_ids3.csv", newline='') as f:
         r = csv.reader(f)
-        for i in range(counter.value):  # count from 0 to counter
+        for i in range(row_num):  # count from 0 to counter
             next(r)  # discard intervening rows
         row = next(r)
         # print(f'row: {row}')
@@ -73,9 +75,8 @@ if __name__ == '__main__':
     # p.close()
     # p.join()
 
-    with Pool(4, None, (counter)) as p:
-        p_id = get_pid()
-        p.starmap(run_process, zip(range(1, 51), repeat(output_filename)))
+    with Pool(3, None, (counter)) as p:
+        p.starmap(run_process, zip(range(1, 52), repeat(output_filename)))
     p.close()
     p.join()
 
