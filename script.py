@@ -41,7 +41,7 @@ def run_process(row_number, output_filename):
 
 def get_pid(row_num):
     # print(f'get_pid {row_num}')
-    with open("property_ids3.csv", newline='') as f:
+    with open("property_ids4.csv", newline='') as f:
         r = csv.reader(f)
         for i in range(row_num):  # count from 0 to counter
             next(r)  # discard intervening rows
@@ -53,29 +53,12 @@ def get_pid(row_num):
 if __name__ == '__main__':
     settings.init()
     counter = Counter(0)
-    print(f'cpu_count - 1 = {cpu_count() -1}')
     start_time = time()
     output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     output_filename = f'output_{output_timestamp}.csv'
 
-    # browser = get_driver()
-    # while counter <= 50:
-    #     p_id = get_pid(counter)
-    #     print(f'Scraping property #{counter}, p_id {p_id}...')
-    #     run_process(p_id, counter, output_filename, browser)
-    #     counter = counter + 1
-    # browser.quit()
-
-    # pool = Pool(4, initializer, (counter, lock))
-
-    # with Pool(cpu_count() - 1) as p:
-    #     p_id = get_pid(counter)
-    #     p.starmap(run_process, zip(range(1, 51), repeat(output_filename)))
-    # p.close()
-    # p.join()
-
     with Pool(3, None, (counter)) as p:
-        p.starmap(run_process, zip(range(1, 155), repeat(output_filename)))
+        p.starmap(run_process, zip(range(1, 3000), repeat(output_filename)))
     p.close()
     p.join()
 

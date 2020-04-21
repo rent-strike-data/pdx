@@ -112,7 +112,7 @@ def get_owner_data(html, p_id):
             'owner': settings.owners,
             'owner_address': settings.owner_addresses
         })
-        if len(properties.index) % 50 == 0:
+        if len(properties.index) % 100 == 0:
             output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
             output_filename = f'output_{output_timestamp}.csv'
             print(f'writing to csv: {output_filename}')
