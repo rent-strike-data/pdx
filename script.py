@@ -4,9 +4,10 @@ from time import sleep, time
 from multiprocessing import Pool, Value, Lock, cpu_count, RawValue
 import csv
 
-from scrapers.scraper import get_driver, connect_to_base, \
+from scraper import get_driver, connect_to_base, \
     get_owner_data
 
+import settings
 
 class Counter(object):
     def __init__(self, initval=0):
@@ -32,9 +33,6 @@ def run_process(row_number, output_filename):
         properties = get_owner_data(html, p_id)
         # print(properties)
         counter.increment()
-        if counter.value % 51 == 0:
-            print(f'writing to csv: {output_filename}')
-            properties.to_csv('result_' + output_filename)
         browser.quit()
     else:
         print('Error connecting')
@@ -53,6 +51,7 @@ def get_pid(row_num):
 
 
 if __name__ == '__main__':
+    settings.init()
     counter = Counter(0)
     print(f'cpu_count - 1 = {cpu_count() -1}')
     start_time = time()
@@ -76,12 +75,11 @@ if __name__ == '__main__':
     # p.join()
 
     with Pool(3, None, (counter)) as p:
-        p.starmap(run_process, zip(range(1, 52), repeat(output_filename)))
+        p.starmap(run_process, zip(range(1, 155), repeat(output_filename)))
     p.close()
     p.join()
 
     end_time = time()
     elapsed_time = end_time - start_time
     print(f'Elapsed run time: {elapsed_time} seconds')
-
 

@@ -1,5 +1,6 @@
 import pandas as pd
-
+import datetime
+import csv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,6 +10,8 @@ import requests
 from lxml.html import fromstring
 from itertools import cycle
 import traceback
+
+import settings
 
 def get_proxies():
     url = 'https://free-proxy-list.net/'
@@ -22,9 +25,6 @@ def get_proxies():
             proxies.add(proxy)
     return proxies
 
-property_ids = []
-owners = []
-owner_addresses = []
 # proxies = get_proxies()
 # proxies = ['121.129.127.209:80', '124.41.215.238:45169', '185.93.3.123:8080', '194.182.64.67:3128', '106.0.38.174:8080', '163.172.175.210:3128', '13.92.196.150:8080']
 # proxy_pool = cycle(proxies)
@@ -47,6 +47,7 @@ def connect_to_base(browser, p_id):
     # print(base_url)
     connection_attempts = 0
     while connection_attempts < 3:
+        print(f'Scraping property {p_id}...')
         try:
             # proxy = next(proxy_pool)
             # browser.get(base_url, proxies={"http": proxy, "https": proxy})
@@ -57,10 +58,19 @@ def connect_to_base(browser, p_id):
                 EC.presence_of_element_located((By.ID, 'summary'))
             )
             return True
-        except Exception as ex:
+        except TimeoutError as err:
+            print(f'TimeoutError connecting to {base_url}. {err}')
             connection_attempts += 1
-            print(f'Error connecting to {base_url}.')
             print(f'Attempt #{connection_attempts}.')
+        except IOError as err:
+            print(f'IOError connecting to {base_url}. {err}')
+            connection_attempts += 1
+            print(f'Attempt #{connection_attempts}.')
+        except Exception as err:
+            print(f'Error connecting to {base_url}. {err}')
+            connection_attempts += 1
+            print(f'Attempt #{connection_attempts}.')
+
     return False
 
 def get_owner_data(html, p_id):
@@ -93,14 +103,19 @@ def get_owner_data(html, p_id):
             owner_address = "NULL"
         # print(owner_address)
 
-        property_ids.append(p_id)
-        owners.append(owner)
-        owner_addresses.append(owner_address)
+        settings.property_ids.append(p_id)
+        settings.owners.append(owner)
+        settings.owner_addresses.append(owner_address)
 
         properties = pd.DataFrame({
-            'p_id': property_ids,
-            'owner': owners,
-            'owner_address': owner_addresses
+            'p_id': settings.property_ids,
+            'owner': settings.owners,
+            'owner_address': settings.owner_addresses
         })
+        if len(properties.index) % 50 == 0:
+            output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+            output_filename = f'output_{output_timestamp}.csv'
+            print(f'writing to csv: {output_filename}')
+            properties.to_csv('result_' + output_filename)
         print(properties)
         return properties
