@@ -16,13 +16,14 @@ property_ids = []
 owners = []
 owner_addresses = []
 
-with open('property_ids3.csv', newline='') as f:
+with open('pids_53a.csv', newline='') as f:
     reader = csv.reader(f)
     p_ids = list(reader)
 
 counter = 0
 for p_id in p_ids:
     p_id = p_id[0]
+    print(counter, p_id)
 
     url = "https://www.portlandmaps.com/detail/property/" + p_id + "_did/"
 
@@ -34,7 +35,7 @@ for p_id in p_ids:
 
     driver = webdriver.Chrome(chrome_options=chrome_options)
     driver.get(url)
-    sleep(randint(3, 7))
+    sleep(1)
     html = driver.page_source
 
     soup = BeautifulSoup(html, 'html.parser')
@@ -76,14 +77,14 @@ for p_id in p_ids:
         })
 
         # to see your dataframe
-        # print(properties)
 
-        # write all scraped data to a CSV file every 50 lines
-        if counter % 50 == 0:
+        # write all scraped data to a CSV file every 100 lines
+        if counter % 100 == 0:
+            print(properties)
             properties.to_csv('result_' + str(counter) + '.csv')
 
         counter = counter + 1
-        print(counter)
+        # print(counter)
         driver.quit()
     # 835k total properties
     # 390k within pdx city limits

@@ -96,7 +96,9 @@ def get_owner_data(html, p_id):
         #     # print("owner found")
         #     # print(owner)
 
-        owner_address = soup.find('dt', string='Owner Address').find_next_sibling('dd').text
+        owner_address_dt = soup.find('dt', string='Owner Address')
+        if owner_address_dt is not None:
+            owner_address = owner_address_dt.find_next_sibling('dd').text
         try:
             owner_address
         except NameError:

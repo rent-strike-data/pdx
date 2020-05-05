@@ -41,7 +41,7 @@ def run_process(row_number, output_filename):
 
 def get_pid(row_num):
     # print(f'get_pid {row_num}')
-    with open("property_ids4.csv", newline='') as f:
+    with open("pids_55a.csv", newline='') as f:
         r = csv.reader(f)
         for i in range(row_num):  # count from 0 to counter
             next(r)  # discard intervening rows
@@ -57,12 +57,14 @@ if __name__ == '__main__':
     output_timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     output_filename = f'output_{output_timestamp}.csv'
 
-    with Pool(3, None, (counter)) as p:
-        p.starmap(run_process, zip(range(1, 3000), repeat(output_filename)))
+    with Pool(1, None, (counter)) as p:
+        p.starmap(run_process, zip(range(1, 2983), repeat(output_filename)))
     p.close()
     p.join()
 
     end_time = time()
     elapsed_time = end_time - start_time
     print(f'Elapsed run time: {elapsed_time} seconds')
+
+#R117203
 
